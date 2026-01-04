@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<title>Soul Ware</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+/* ---------- Fancy Button ---------- */
+button.fancy-btn {
+  --purple: #9B7EDA;
+  font-size: 18px;
+  padding: 0.8em 3em;
+  letter-spacing: 0.08em;
+  position: relative;
+  font-family: inherit;
+  border-radius: 0.6em;
+  overflow: hidden;
+  transition: all 0.3s;
+  line-height: 1.4em;
+  border: 2px solid var(--purple);
+  background: linear-gradient(to right, rgba(155, 126, 218, 0.1) 1%, transparent 40%, transparent 60%, rgba(155, 126, 218, 0.1) 100%);
+  color: var(--purple);
+  box-shadow: inset 0 0 10px rgba(155, 126, 218, 0.4), 0 0 9px 3px rgba(155, 126, 218, 0.1);
+  cursor: pointer;
+}
+
+
+button.fancy-btn:hover {  color: #BFA3F3;  box-shadow: inset 0 0 10px rgba(155, 126, 218, 0.6), 0 0 9px 3px rgba(155, 126, 218, 0.2);}
+button.fancy-btn:before {  content: "";  position: absolute;  left: -4em;  width: 4em;  height: 100%;  top: 0;  transition: transform .4s ease-in-out;  background: linear-gradient(to right, transparent 1%, rgba(155, 126, 218, 0.1) 40%, rgba(155, 126, 218, 0.1) 60%, transparent 100%);}
+button.fancy-btn:hover:before {  transform: translateX(15em);}
+html, body {    margin: 0;    padding: 0;    overflow: hidden;    background: #000;    font-family: 'Orbitron', sans-serif;    height: 100%;}
+canvas {    display: block;    position: absolute;    top: 0;    left: 0;    width: 100%;    height: 100%;    z-index: 1;}
+/* ---------- UI Buttons ---------- */
+.ui {    position: fixed;    top: 24px;    right: 24px;    display: flex;    gap: 14px;    z-index: 10;}
+.ui button {    background: rgba(30, 107, 214, 0.12);    border: 1px solid rgba(74, 163, 255, 0.6);    color: #4aa3ff;    padding: 10px 22px;    font-size: 14px;    letter-spacing: 1.5px;    cursor: pointer;    border-radius: 6px;    backdrop-filter: blur(6px);    transition: all 0.25s ease;}
+.ui button:hover {    background: rgba(74, 163, 255, 0.25);    box-shadow: 0 0 14px rgba(74, 163, 255, 0.7);    transform: translateY(-1px);}
+.ui button:active { transform: scale(0.97); }
+
+/* ---------- Dropdown ---------- */
+#dropdown-container {    display: none;    z-index: 20;}
+#dropdown-container a {    background: rgba(74,163,255,0.3);    color: #fff;    padding: 6px 12px;    border-radius: 6px;    margin: 2px 0;    text-decoration: none;    font-weight: 600;    transition: 0.2s;}
+#dropdown-container a:hover {    background: rgba(74,163,255,0.7);}
+
+/* --------- Videos left --------- */
+.videos {    position: fixed;    left: 30px;    top: 120px;    display: flex;    flex-direction: column;    gap: 20px;    z-index: 10;}
+.videos video {    width: 160px;    height: 100px;    object-fit: cover;    border-radius: 12px;    transform: rotate(-20deg);    box-shadow: 0 4px 12px rgba(0,0,0,0.5);    cursor: pointer;    transition: transform 0.3s ease, box-shadow 0.3s ease;}
+.videos video:hover {    transform: rotate(0deg) scale(1.05);    box-shadow: 0 8px 20px rgba(0,0,0,0.7);}
+
+/* --------- Images right --------- */
+.images {    position: fixed;    right: 30px;    top: 120px;    display: flex;    flex-direction: column;    gap: 20px;    z-index: 10;}
+.images img {    width: 160px;    height: 100px;    object-fit: cover;    border-radius: 12px;    transform: rotate(20deg);    box-shadow: 0 4px 12px rgba(0,0,0,0.5);    cursor: pointer;    transition: transform 0.3s ease, box-shadow 0.3s ease;    position: relative;}
+.images img:hover {    transform: rotate(0deg) scale(1.05);    box-shadow: 0 8px 20px rgba(0,0,0,0.7);}
+
+/* --------- Center Sections --------- */
+.center-sections {    position: fixed;    top: 50%;    left: 50%;    transform: translate(-50%, -50%);    display: flex;    gap: 40px;    z-index: 10;}
+.section {    width: 430px;    background: rgba(30,107,214,0.15);    border: 2px solid rgba(74,163,255,0.6);    border-radius: 16px;    backdrop-filter: blur(6px);    display: flex;    flex-direction: column;    align-items: center;    padding: 10px;    transition: all 0.3s ease;}
+.section {
+  --neon-color: #39ff14;
+  --text-color: #ff0000;
+}
+/* --- Red highlight on update --- */
+.section.update-flash {
+  box-shadow:
+    0 0 15px rgba(255, 0, 0, 0.7),
+    0 0 35px rgba(255, 0, 0, 0.6),
+    inset 0 0 20px rgba(255, 0, 0, 0.4);
+  border-color: red;
+}
+
+
+.section img {    width: 100%;    height: 260px;    object-fit: cover;    border-radius: 12px;    box-shadow: 0 4px 12px rgba(0,0,0,0.5);    cursor: pointer;}
+.section button.download-btn {    background: rgba(74,163,255,0.3);    border: none;    padding: 8px 16px;    border-radius: 6px;    color: #fff;    font-weight: 600;    cursor: pointer;    margin-top: 6px;    transition: all 0.2s ease;}
+.section button.download-btn:hover {    background: rgba(74,163,255,0.6);}
+ .section .free-text {
+  color: var(--text-color);
+  font-weight: 700;
+  font-size: 16px;
+  text-shadow:
+    0 0 5px var(--neon-color),
+    0 0 10px var(--neon-color),
+    0 0 20px var(--neon-color),
+    0 0 30px var(--neon-color);
+  margin: 8px 0;
+}
+
+.section .func-buttons {    display: flex;    flex-wrap: wrap;    justify-content: center;    gap: 6px;    margin-bottom: 6px;}
+.section .func-buttons button {    font-size: 12px;    padding: 4px 8px;    border-radius: 6px;    border: 1px solid rgba(74,163,255,0.6);    background: rgba(30,107,214,0.2);    color: #4aa3ff;    cursor: pointer;    transition: all 0.2s ease;}
+.section .func-buttons button:hover {    background: rgba(74,163,255,0.6);    color: #00b7ff;}
+/* ---------- Modal download ---------- */
+.download-modal {    display: none;    position: fixed;    top:0;    left:0;    width:100%;    height:100%;    background: rgba(0,0,0,0.85);    justify-content: center;    align-items: center;    z-index: 20;    flex-direction: column;    color: #fff;    font-family: 'Orbitron', sans-serif;    text-align: center;}
+.download-modal img {    max-width: 80%;    max-height: 60%;    border-radius: 12px;    margin-bottom: 20px;    box-shadow: 0 0 20px rgba(0,255,0,0.5);}
+.download-modal h2 {    margin-bottom: 20px;    font-size: 22px;    color: #4aa3ff;}
+.download-modal button {    padding: 10px 20px;    font-size: 16px;    border-radius: 8px;    border: none;    cursor: pointer;    background: #4aa3ff;    color: #fff;    font-weight: 700;}
+.download-modal button:hover {    background: #76c1ff;}
+
+/* ---------- Terminal Overlay ---------- */
+#terminal-overlay {  position: fixed;  inset: 0;  background: rgba(0,0,0,0.85);  display: none;  justify-content: center;  align-items: center;  z-index: 50;}
+/* ---------- Animations ---------- */
+@keyframes blinkCursor {  50% { border-right-color: transparent; }}
+@keyframes typeAndDelete-long {  0%,10% { width: 0; }  45%,55% { width: 10em; }  90%,100% { width: 0; }}
+@keyframes typeAndDelete-short {  0%,10% { width: 0; }  45%,55% { width: 6.2em; }  90%,100% { width: 0; }}
+/* ---------- Terminal ---------- */
+.terminal-loader {  border: 0.1em solid #333;  background-color: #1a1a1a;  color: #0f0;  font-family: "Courier New", monospace;  font-size: 1em;  padding: 1.5em 1em;  width: 22em;  border-radius: 10px;  position: relative;  box-shadow: 0 10px 8px rgba(0,0,0,0.4);}
+.terminal-header {  position: absolute;  top: 0;  left: 0;  right: 0;  height: 1.5em;  background: #333;  border-radius: 4px 4px 0 0;  padding: 0 0.4em;}
+.terminal-controls { float: right; }
+.control {  width: 0.6em;  height: 0.6em;  border-radius: 50%;  display: inline-block;  margin-left: 0.4em;}.control.close {  background:#e33; }.control.minimize { background:#ee0; }.control.maximize { background:#0b0; }
+.terminal-title {  float: left;  color: #eee;  line-height: 1.5em;}
+.text {  margin-top: 1.5em;  white-space: nowrap;  overflow: hidden;  border-right: 0.2em solid green;}
+/* STATES */
+.text.phase-1 {  animation: typeAndDelete-long 4s steps(11) infinite, blinkCursor 0.5s step-end infinite alternate;}
+.text.phase-2 {  animation: typeAndDelete-short 4s steps(11) infinite, blinkCursor 0.5s step-end infinite;}
+</style>
+</head>
+<body>
+<!-- 1. Кнопка входа (убрана) -->
+
+<!-- 2. Окно входа (убрано) -->
+
+<!-- Остальной твой код -->
+<div id="terminal-overlay">
+  <div class="terminal-loader" id="terminal">
+    <div class="terminal-header">
+      <span class="terminal-title">terminal</span>
+      <div class="terminal-controls">
+        <span class="control close"></span>
+        <span class="control minimize"></span>
+        <span class="control maximize"></span>
+      </div>
+    </div>
+    <div class="text" id="terminal-text">Downloading...</div>
+  </div>
+</div>
+
+<div class="ui">
+    <button id="supportBtn">SUPPORT</button>
+    <button id="TelegramBtn">Telegram</button>
+    <div id="dropdown-container"></div>
+</div>
+
+<!-- Videos left -->
+<div class="videos"></div>
+
+<!-- Images right -->
+<div class="images"></div>
+
+<!-- Center Sections -->
+<div class="center-sections">
+<div class="section" style="--neon-color:#2824ff; --text-color:#0077ff;">
+    <img src="https://avatars.mds.yandex.net/i?id=d97e990c22d84435877ec686184029c7_l-5875933-images-thumbs&n=13" />
+    <div class="free-text">Free Version - update</div>
+        <div class="func-buttons">
+            <button>aimbot</button>
+            <button>esp players</button>
+            <button>esp loot</button>
+            <button>esp ore</button>
+            <button>misc</button>
+            <button>world settings</button>
+            <button>settings</button>
+            <button>config create</button>
+            <button>config load</button>
+        </div>
+        <button class="download-btn fancy-btn">update</button>
+    </div>
+    <div class="section" style="--neon-color:#437c1e; --text-color:#77c70f;">
+    <img src="https://avatars.mds.yandex.net/i?id=c727fb89d86b4f2df8d8037b92977b1e_sr-5086676-images-thumbs&n=13" />
+    <div class="free-text">Free Version - Undetect</div>
+        <div class="func-buttons">
+            <button>aimbot</button>
+            <button>esp players</button>
+            <button>esp loot</button>
+            <button>esp ore</button>
+            <button>misc</button>
+            <button>world settings</button>
+            <button>settings</button>
+            <button>config create</button>
+            <button>config load</button>
+        </div>
+        <button class="download-btn fancy-btn">Download</button>
+    </div>
+    <div class="section" style="--neon-color:#2824ff; --text-color:#0077ff;">
+    <img src="https://images.boosty.to/user/26475996/avatar?change_time=1731723162&mh=630" />
+    <div class="free-text">Free Version - update</div>
+        <div class="func-buttons">
+            <button>aimbot</button>
+            <button>esp players</button>
+            <button>esp loot</button>
+            <button>esp ore</button>
+            <button>misc</button>
+            <button>world settings</button>
+            <button>settings</button>
+            <button>config create</button>
+            <button>config load</button>
+        </div>
+        <button class="download-btn fancy-btn">update</button>
+    </div>
+</div>
+
+<!-- Canvas -->
+<canvas id="canvas"></canvas>
+
+<script>
+// ================= Canvas Logo & Stars =================
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+resize();
+window.addEventListener("resize", resize);
+
+// Logo
+const logo = { x: 960, y: 140, radius: 120 };
+const ringRadii = [
+    {inner: logo.radius + 15, outer: logo.radius + 40},
+    {inner: logo.radius + 50, outer: logo.radius + 75},
+    {inner: logo.radius + 80, outer: logo.radius + 110}
+];
+const ringAngle = Math.PI / 9;
+
+function drawLogo() {
+    const cx = logo.x;
+    const cy = logo.y;
+    const planetCanvas = document.createElement('canvas');
+    planetCanvas.width = planetCanvas.height = logo.radius*2 + 60;
+    const pCtx = planetCanvas.getContext('2d');
+    const gradient = pCtx.createLinearGradient(0,0,planetCanvas.width,planetCanvas.height);
+    gradient.addColorStop(0, '#0b3d91');
+    gradient.addColorStop(0.3, '#2060b3');
+    gradient.addColorStop(0.6, '#0b2b5f');
+    gradient.addColorStop(1, '#104080');
+    pCtx.fillStyle = gradient;
+    pCtx.fillRect(0,0,planetCanvas.width,planetCanvas.height);
+    for(let i=0;i<30;i++){
+        pCtx.beginPath();
+        const y = Math.random() * planetCanvas.height;
+        pCtx.moveTo(0, y);
+        pCtx.bezierCurveTo(planetCanvas.width*0.3, y+Math.random()*20-10, planetCanvas.width*0.7, y+Math.random()*20-10, planetCanvas.width, y);
+        pCtx.lineWidth = 2 + Math.random()*2;
+        pCtx.strokeStyle = 'rgba(255,255,255,' + (Math.random()*0.05+0.02) + ')';
+        pCtx.stroke();
+    }
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.beginPath();
+    ctx.arc(0,0,logo.radius,0,Math.PI*2);
+    ctx.closePath();
+    ctx.clip();
+    ctx.drawImage(planetCanvas, -planetCanvas.width/2, -planetCanvas.height/2);
+    ctx.restore();
+    ringRadii.forEach(r => {
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(ringAngle);
+        ctx.beginPath();
+        ctx.ellipse(0,0,r.outer,(r.outer-r.inner),0,0,Math.PI*2);
+        const ringGrad = ctx.createLinearGradient(-r.outer,0,r.outer,0);
+        ringGrad.addColorStop(0, "rgba(0,180,255,0.2)");
+        ringGrad.addColorStop(0.4, "rgba(0,120,255,0.25)");
+        ringGrad.addColorStop(0.7, "rgba(0,40,80,0.3)");
+        ringGrad.addColorStop(0.85, "rgba(255,255,255,0.2)");
+        ringGrad.addColorStop(1, "rgba(0,180,255,0.15)");
+        ctx.fillStyle = ringGrad;
+        ctx.fill();
+        ctx.restore();
+    });
+    ctx.beginPath();
+    ctx.arc(cx, cy, logo.radius, 0, Math.PI*2);
+    ctx.strokeStyle = "#3c8cff";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    drawText(cx, cy);
+}
+function drawText(cx, cy){
+    ctx.textAlign="center";
+    ctx.textBaseline="middle";
+    ctx.shadowBlur=12;
+    ctx.shadowColor="#4aa3ff";
+    ctx.font="700 56px Orbitron";
+    ctx.fillStyle="#4aa3ff";
+    ctx.fillText("S",cx-32,cy-18);
+    ctx.shadowBlur=8;
+    ctx.shadowColor="#ffffff";
+    ctx.font="400 36px Orbitron";
+    ctx.fillStyle="#ffffff";
+    ctx.fillText("oul",cx+14,cy-14);
+    ctx.shadowBlur=12;
+    ctx.shadowColor="#4aa3ff";
+    ctx.font="700 48px Orbitron";
+    ctx.fillStyle="#4aa3ff";
+    ctx.fillText("W",cx-30,cy+36);
+    ctx.shadowBlur=8;
+    ctx.shadowColor="#ffffff";
+    ctx.font="400 34px Orbitron";
+    ctx.fillStyle="#ffffff";
+    ctx.fillText("are",cx+14,cy+40);
+    ctx.shadowBlur=0;
+}
+
+// Stars
+const stars=[];
+const STAR_COUNT=300;
+for(let i=0;i<STAR_COUNT;i++){
+    const color = Math.random()<0.25 ? "rgba(255,255,180,0.9)" : "rgba(255,255,255,0.9)";
+    stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,size:Math.random()*1.5+0.3,color:color});
+}
+
+// Shooting stars
+const shootingStars=[];
+function spawnShootingStar(){
+    const startX = Math.random()*canvas.width*0.7 + canvas.width*0.15;
+    const startY = Math.random()*canvas.height*0.3;
+    const speed = 8 + Math.random()*5;
+    const length = 120 + Math.random()*50;
+    shootingStars.push({ x:startX, y:startY, vx:speed, vy:speed*0.6, length:length, opacity:1 });
+    const delay = 10000 + Math.random()*15000;
+    setTimeout(spawnShootingStar,delay);
+}
+spawnShootingStar();
+function drawShootingStars(){
+    shootingStars.forEach((s,index)=>{
+        for(let i=0;i<6;i++){
+            ctx.beginPath();
+            ctx.moveTo(s.x - i*0.8, s.y - i*0.5);
+            ctx.lineTo(s.x - s.vx - i*0.8, s.y - s.vy - i*0.5);
+            ctx.strokeStyle = `rgba(200,255,255,${s.opacity*0.15})`;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+        ctx.beginPath();
+        ctx.arc(s.x,s.y,2.5,0,Math.PI*2);
+        ctx.fillStyle=`rgba(255,255,255,${s.opacity})`;
+        ctx.shadowBlur=20;
+        ctx.shadowColor="white";
+        ctx.fill();
+        ctx.shadowBlur=0;
+        s.x += s.vx;
+        s.y += s.vy;
+        s.opacity -= 0.02;
+        if(s.opacity<=0) shootingStars.splice(index,1);
+    });
+}
+
+// Animate
+function animate(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    stars.forEach(s=>{ ctx.beginPath(); ctx.arc(s.x,s.y,s.size,0,Math.PI*2); ctx.fillStyle=s.color; ctx.fill(); });
+    drawLogo();
+    drawShootingStars();
+    requestAnimationFrame(animate);
+}
+animate();
+
+// Images right
+const imageUrls = [
+  "https://i.pinimg.com/originals/41/55/57/4155575edf0038f53a1ae86c2539e474.jpg?nii=t",
+  "https://i.pinimg.com/originals/41/55/57/4155575edf0038f53a1ae86c2539e474.jpg?nii=t",
+  "https://i.pinimg.com/originals/41/55/57/4155575edf0038f53a1ae86c2539e474.jpg?nii=t",
+  "https://i.pinimg.com/originals/41/55/57/4155575edf0038f53a1ae86c2539e474.jpg?nii=t",
+  "https://i.pinimg.com/originals/41/55/57/4155575edf0038f53a1ae86c2539e474.jpg?nii=t"
+];
+const imagesContainer = document.querySelector(".images");
+imageUrls.forEach(src=>{
+    const img = document.createElement("img");
+    img.src = src;
+    imagesContainer.appendChild(img);
+});
+
+// Videos left
+const videoUrls = [
+  "https://v.ftcdn.net/02/36/52/66/700_F_236526668_sJEEsPShWtxaMIvIKjZFBYLn608XXu7G_ST.mp4",
+  "https://v.ftcdn.net/02/36/52/66/700_F_236526668_sJEEsPShWtxaMIvIKjZFBYLn608XXu7G_ST.mp4",
+  "https://v.ftcdn.net/02/36/52/66/700_F_236526668_sJEEsPShWtxaMIvIKjZFBYLn608XXu7G_ST.mp4",
+  "https://v.ftcdn.net/02/36/52/66/700_F_236526668_sJEEsPShWtxaMIvIKjZFBYLn608XXu7G_ST.mp4",
+  "https://v.ftcdn.net/02/36/52/66/700_F_236526668_sJEEsPShWtxaMIvIKjZFBYLn608XXu7G_ST.mp4"
+];
+const videosContainer = document.querySelector(".videos");
+videoUrls.forEach(src=>{
+    const video = document.createElement("video");
+    video.src = src;
+    video.autoplay = true;
+    video.loop = true;
+    video.muted = true;
+    videosContainer.appendChild(video);
+});
+
+const terminalOverlay = document.getElementById("terminal-overlay");
+const terminalText = document.getElementById("terminal-text");
+const downloadBtns = document.querySelectorAll(".download-btn");
+const DOWNLOAD_LINK = "https://disk.yandex.ru/d/HDSuuAViv2u8xg";
+
+downloadBtns.forEach(btn => {
+  btn.addEventListener("click", () => {
+
+    const text = btn.textContent.toLowerCase();
+    const section = btn.closest(".section");
+
+    // 🔴 UPDATE — только подсветка
+    if (text.includes("update")) {
+      section.classList.add("update-flash");
+
+      setTimeout(() => {
+        section.classList.remove("update-flash");
+      }, 2000);
+
+      return;
+    }
+
+    // 🟢 DOWNLOAD — анимация + скачивание
+    terminalOverlay.style.display = "flex";
+
+    terminalText.textContent = "Downloading...";
+    terminalText.className = "text phase-1";
+
+    // смена текста
+    setTimeout(() => {
+      terminalText.textContent = "Complete!";
+      terminalText.className = "text phase-2";
+    }, 4500);
+
+    // ❗ ПОСЛЕ окончания анимации — СКАЧИВАНИЕ
+    setTimeout(() => {
+      terminalOverlay.style.display = "none";
+
+      // запуск загрузки файла
+      const a = document.createElement("a");
+      a.href = DOWNLOAD_LINK;
+      a.target = "_blank";
+      a.click();
+
+    }, 9000);
+
+  });
+});
+// -------- Dropdown --------
+const TELEGRAM = "https://web.telegram.org/k/#@SoulwareDev";
+
+document.getElementById("TelegramBtn").addEventListener("click", () => {
+  window.open(TELEGRAM, "_blank");
+});
+
+const DISCORD = "https://discord.gg/8byKeGPK";
+const dropdown = document.getElementById("dropdown-container");
+
+// Обработка клика по новой кнопке
+document.getElementById("contactsBtn").onclick = (e) => {
+  dropdown.innerHTML = `<a href="${TELEGRAM}" target="_blank">Telegram</a>`;
+  dropdown.style.display = "flex";
+  dropdown.style.flexDirection = "column";
+  const rect = e.target.getBoundingClientRect();
+  dropdown.style.position = "absolute";
+  dropdown.style.top = rect.bottom + "px";
+  dropdown.style.left = rect.left + "px";
+};
+
+document.getElementById("contactsBtn").onclick = (e) => {
+  dropdown.innerHTML = `
+    <a href="${TELEGRAM}" target="_blank">Telegram</a>
+    <a href="${DISCORD}" target="_blank">Discord</a>
+  `;
+  dropdown.style.display = "flex";
+  dropdown.style.flexDirection = "column";
+  const rect = e.target.getBoundingClientRect();
+  dropdown.style.position = "absolute";
+  dropdown.style.top = rect.bottom + "px";
+  dropdown.style.left = rect.left + "px";
+};
+
+document.addEventListener("click", e => {
+  if (!e.target.matches("#supportBtn, #contactsBtn")) {
+    dropdown.style.display = "none";
+  }
+});    
+// Ваш существующий скрипт может быть тут
+
+// --- ВАШИ ДОПОЛНЕНИЯ ---
+</script>
+</body>
+</html>
